@@ -1,0 +1,23 @@
+bundle:
+  name: cdc_pipeline
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    # No workspace.host here on purpose -- the CLI picks up DATABRICKS_HOST /
+    # DATABRICKS_TOKEN from the environment (GitHub Actions secrets), so the
+    # same bundle config works for dev, staging, prod without editing this file
+    # per environment. If you'd rather pin it, add:
+    # workspace:
+    #   host: https://<your-workspace>.azuredatabricks.net
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Shared/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      user_name: <service-principal-or-user-to-run-as>

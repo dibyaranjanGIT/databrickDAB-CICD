@@ -1,0 +1,83 @@
+resources:
+  jobs:
+    cdc_incremental_load_tiered:
+      name: cdc_incremental_load_tiered
+
+      tasks:
+        - task_key: get_tier1_tables
+          notebook_task:
+            notebook_path: ../src/notebooks/02_get_tier_tables.py
+            base_parameters:
+              tier: "1"
+
+        - task_key: load_tier_1
+          depends_on:
+            - task_key: get_tier1_tables
+          for_each_task:
+            inputs: "{{tasks.get_tier1_tables.values.control_rows}}"
+            concurrency: 3
+            task:
+              task_key: load_tier_1_iteration
+              notebook_task:
+                notebook_path: ../src/notebooks/03_generic_incremental_loader.py
+                base_parameters:
+                  control_row: "{{input}}"
+
+        - task_key: get_tier2_tables
+          depends_on:
+            - task_key: load_tier_1
+          notebook_task:
+            notebook_path: ../src/notebooks/02_get_tier_tables.py
+            base_parameters:
+              tier: "2"
+
+        - task_key: load_tier_2
+          depends_on:
+            - task_key: get_tier2_tables
+          for_each_task:
+            inputs: "{{tasks.get_tier2_tables.values.control_rows}}"
+            concurrency: 3
+            task:
+              task_key: load_tier_2_iteration
+              notebook_task:
+                notebook_path: ../src/notebooks/03_generic_incremental_loader.py
+                base_parameters:
+                  control_row: "{{input}}"
+
+        - task_key: get_tier3_tables
+          depends_on:
+            - task_key: load_tier_2
+          notebook_task:
+            notebook_path: ../src/notebooks/02_get_tier_tables.py
+            base_parameters:
+              tier: "3"
+
+        - task_key: load_tier_3
+          depends_on:
+            - task_key: get_tier3_tables
+          for_each_task:
+            inputs: "{{tasks.get_tier3_tables.values.control_rows}}"
+            concurrency: 3
+            task:
+              task_key: load_tier_3_iteration
+              notebook_task:
+                notebook_path: ../src/notebooks/03_generic_incremental_loader.py
+                base_parameters:
+                  control_row: "{{input}}"
+
+        - task_key: orchestrate_silver
+          depends_on:
+            - task_key: load_tier_3
+          notebook_task:
+            notebook_path: ../src/notebooks/orchestrate_silver.py
+
+        - task_key: orchestrate_gold
+          depends_on:
+            - task_key: orchestrate_silver
+          notebook_task:
+            notebook_path: ../src/notebooks/orchestrate_gold.py
+
+      schedule:
+        quartz_cron_expression: "0 0 1 * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: PAUSED
