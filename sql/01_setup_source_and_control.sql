@@ -94,16 +94,16 @@ CREATE OR REPLACE TABLE control.pipeline_control (
 );
 
 INSERT INTO control.pipeline_control VALUES
- ('source_sim.customers',     'bronze.customers',     1, 'updated_at', 'customer_id',   TIMESTAMP('1900-01-01'), true),
- ('source_sim.products',      'bronze.products',      1, 'updated_at', 'product_id',    TIMESTAMP('1900-01-01'), true),
- ('source_sim.categories',    'bronze.categories',    1, 'updated_at', 'category_id',   TIMESTAMP('1900-01-01'), true),
- ('source_sim.orders',        'bronze.orders',        2, 'updated_at', 'order_id',      TIMESTAMP('1900-01-01'), true),
- ('source_sim.order_items',   'bronze.order_items',   2, 'updated_at', 'order_item_id', TIMESTAMP('1900-01-01'), true),
- ('source_sim.payments',      'bronze.payments',      2, 'updated_at', 'payment_id',    TIMESTAMP('1900-01-01'), true),
- ('source_sim.shipments',     'bronze.shipments',     3, 'updated_at', 'shipment_id',   TIMESTAMP('1900-01-01'), true),
- ('source_sim.returns',       'bronze.returns',       3, 'updated_at', 'return_id',     TIMESTAMP('1900-01-01'), true),
- ('source_sim.refunds',       'bronze.refunds',       3, 'updated_at', 'refund_id',     TIMESTAMP('1900-01-01'), true),
- ('source_sim.inventory_log', 'bronze.inventory_log', 3, 'updated_at', 'log_id',        TIMESTAMP('1900-01-01'), true);
+ ('cdc_demo.source_sim.customers',     'cdc_demo.bronze.customers',     1, 'updated_at', 'customer_id',   TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.products',      'cdc_demo.bronze.products',      1, 'updated_at', 'product_id',    TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.categories',    'cdc_demo.bronze.categories',    1, 'updated_at', 'category_id',   TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.orders',        'cdc_demo.bronze.orders',        2, 'updated_at', 'order_id',      TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.order_items',   'cdc_demo.bronze.order_items',   2, 'updated_at', 'order_item_id', TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.payments',      'cdc_demo.bronze.payments',      2, 'updated_at', 'payment_id',    TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.shipments',     'cdc_demo.bronze.shipments',     3, 'updated_at', 'shipment_id',   TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.returns',       'cdc_demo.bronze.returns',       3, 'updated_at', 'return_id',     TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.refunds',       'cdc_demo.bronze.refunds',       3, 'updated_at', 'refund_id',     TIMESTAMP('1900-01-01'), true),
+ ('cdc_demo.source_sim.inventory_log', 'cdc_demo.bronze.inventory_log', 3, 'updated_at', 'log_id',        TIMESTAMP('1900-01-01'), true);
 
 -- sanity check
 SELECT tier, count(*) AS tables_in_tier FROM control.pipeline_control GROUP BY tier ORDER BY tier;

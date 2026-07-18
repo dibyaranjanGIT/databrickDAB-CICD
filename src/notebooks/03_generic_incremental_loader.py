@@ -84,7 +84,7 @@ if row_count > 0:
     new_watermark = incremental_df.agg(F.max(watermark_col)).collect()[0][0]
 
     spark.sql(f"""
-        UPDATE control.pipeline_control
+        UPDATE cdc_demo.control.pipeline_control
         SET last_loaded_ts = '{new_watermark}'
         WHERE source_table = '{source_table}'
     """)

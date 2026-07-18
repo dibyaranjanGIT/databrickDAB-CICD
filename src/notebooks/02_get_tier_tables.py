@@ -16,7 +16,7 @@ tier = int(dbutils.widgets.get("tier"))
 rows = spark.sql(f"""
     SELECT source_table, target_table, watermark_col, primary_key,
            CAST(last_loaded_ts AS STRING) AS last_loaded_ts
-    FROM control.pipeline_control
+    FROM cdc_demo.control.pipeline_control
     WHERE tier = {tier} AND is_active = true
 """).collect()
 
