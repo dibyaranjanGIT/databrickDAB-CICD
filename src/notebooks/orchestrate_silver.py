@@ -15,8 +15,17 @@ import sys, os
 #   /Workspace/Users/<you>/.bundle/cdc_pipeline/dev/files/src/notebooks/orchestrate_silver
 # A hardcoded path would only work for one specific target/user.
 notebook_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
+
+# notebookPath() returns the path WITHOUT the /Workspace prefix (e.g.
+# /Users/<you>/.bundle/.../orchestrate_silver), but the actual filesystem
+# mount that Python needs for imports lives under /Workspace/... -- so it
+# has to be added back on before this is usable in sys.path.
+if not notebook_path.startswith("/Workspace"):
+    notebook_path = "/Workspace" + notebook_path
+
 src_root = os.path.dirname(os.path.dirname(notebook_path))  # .../files/src
 sys.path.append(src_root)
+print(f"Added to sys.path: {src_root}")
 
 from transformations.customers import clean_customers
 from transformations.products import clean_products

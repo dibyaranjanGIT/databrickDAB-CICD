@@ -8,8 +8,13 @@
 import sys, os
 
 notebook_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
+
+if not notebook_path.startswith("/Workspace"):
+    notebook_path = "/Workspace" + notebook_path
+
 src_root = os.path.dirname(os.path.dirname(notebook_path))  # .../files/src
 sys.path.append(src_root)
+print(f"Added to sys.path: {src_root}")
 
 from transformations.dimensions import build_dim_customer, build_dim_product, build_dim_date
 from transformations.facts import build_fact_orders
