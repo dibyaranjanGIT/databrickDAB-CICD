@@ -1,0 +1,13 @@
+resources:
+  jobs:
+    bootstrap_schema:
+      name: bootstrap_schema
+      tasks:
+        - task_key: run_bootstrap
+          notebook_task:
+            notebook_path: ../src/notebooks/bootstrap_schema.py
+      # Deliberately NOT scheduled and NOT chained into
+      # cdc_incremental_load_tiered -- schema bootstrap should run when the
+      # schema actually changes, not on every single ingestion run. Trigger
+      # it manually with:
+      #   databricks bundle run bootstrap_schema -t dev

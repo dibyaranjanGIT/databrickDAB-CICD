@@ -14,6 +14,13 @@ dbutils.widgets.text("control_row", "")
 import json
 from pyspark.sql import functions as F
 
+# Pin the catalog explicitly -- don't rely on whatever the session's default
+# catalog happens to be. This is what caused TABLE_OR_VIEW_NOT_FOUND: bronze
+# tables were being resolved against the session default catalog instead of
+# cdc_demo, because source_table/target_table in the control table weren't
+# fully qualified with a catalog.
+spark.sql("USE CATALOG cdc_demo")
+
 row = json.loads(dbutils.widgets.get("control_row"))
 
 source_table   = row["source_table"]
@@ -35,9 +42,13 @@ print(f"Loading {source_table} -> {target_table}  (watermark > {last_loaded_ts})
 USE_REAL_JDBC = False  # flip to True once pointed at your real JDBC source
 
 if USE_REAL_JDBC:
-    jdbc_url  = dbutils.secrets.get("de_grp_scope", "jdbc_url")
-    jdbc_user = dbutils.secrets.get("de_grp_scope", "jdbc_user")
-    jdbc_pwd  = dbutils.secrets.get("de_grp_scope", "jdbc_password")
+    # Reads from the Azure Key Vault-backed secret scope "akv_jdbc_scope".
+    # Note the hyphens, not underscores -- Azure Key Vault secret names can't
+    # contain underscores, so the key names here must match exactly what was
+    # created in the vault (jdbc-url, jdbc-user, jdbc-password).
+    jdbc_url  = dbutils.secrets.get("akv_jdbc_scope", "jdbc-url")
+    jdbc_user = dbutils.secrets.get("akv_jdbc_scope", "jdbc-user")
+    jdbc_pwd  = dbutils.secrets.get("akv_jdbc_scope", "jdbc-password")
 
     push_down_query = (
         f"(SELECT * FROM {source_table} "
