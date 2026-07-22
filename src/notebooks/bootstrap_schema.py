@@ -31,9 +31,18 @@ ddl_file = os.path.join(sql_dir, "09_bootstrap_schema_idempotent.sql")
 with open(ddl_file) as f:
     script = f.read()
 
-for statement in script.split(";"):
+# Strip full-line SQL comments BEFORE splitting on ";" -- splitting the raw
+# text directly is what caused the earlier bug: a semicolon inside an
+# English sentence in a comment ("...runs; this comment...") got treated as
+# a statement boundary, since split(";") has no idea what a SQL comment is.
+# Removing "--" lines first means a stray semicolon in a comment can never
+# fool the splitter again.
+lines = [ln for ln in script.split("\n") if not ln.strip().startswith("--")]
+script_no_comments = "\n".join(lines)
+
+for statement in script_no_comments.split(";"):
     statement = statement.strip()
-    if statement and not statement.startswith("--"):
+    if statement:
         spark.sql(statement)
 
 print("Schema/table DDL applied.")
