@@ -2,6 +2,10 @@ resources:
   jobs:
     bootstrap_schema:
       name: bootstrap_schema
+      email_notifications:
+        on_failure:
+          - dibyaranjan.official@outlook.com
+        no_alert_for_skipped_runs: false
       tasks:
         - task_key: run_bootstrap
           notebook_task:
