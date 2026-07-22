@@ -13,9 +13,13 @@ notebook_path = dbutils.notebook.entry_point.getDbutils().notebook().getContext(
 if not notebook_path.startswith("/Workspace"):
     notebook_path = "/Workspace" + notebook_path
 
-# This notebook lives at .../files/src/notebooks/bootstrap_schema -- go up
-# two levels to .../files, then into sql/.
-sql_dir = os.path.join(os.path.dirname(os.path.dirname(notebook_path)), "sql")
+# This notebook lives at .../files/src/notebooks/bootstrap_schema. sql/ is a
+# SIBLING of src/ (repo root: databricks.yml, resources/, src/, sql/, tests/),
+# not inside it -- so this needs three levels up from the notebook path:
+#   dirname #1: .../files/src/notebooks   (strips "bootstrap_schema")
+#   dirname #2: .../files/src             (strips "notebooks")
+#   dirname #3: .../files                 (strips "src" -- this is the one that was missing)
+sql_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(notebook_path))), "sql")
 print(f"Reading DDL from: {sql_dir}")
 
 # COMMAND ----------
